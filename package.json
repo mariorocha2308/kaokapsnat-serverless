@@ -1,0 +1,20 @@
+{
+  "name": "chat-online-serverless",
+  "version": "1.0.0",
+  "description": "",
+  "main": "handler.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "serverless-offline": "^13.3.3"
+  },
+  "dependencies": {
+    "aws-sdk": "^2.1575.0",
+    "bcrypt": "^5.1.1",
+    "uuid": "^9.0.1"
+  }
+}

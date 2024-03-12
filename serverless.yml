@@ -1,0 +1,73 @@
+# Welcome to Serverless!
+#
+# This file is the main config file for your service.
+# It's very minimal at this point and uses default values.
+# You can always add more config options for more control.
+# We've included some commented out config examples here.
+# Just uncomment any of them to get that config option.
+#
+# For full config options, check the docs:
+#    docs.serverless.com
+#
+# Happy Coding!
+
+service: chat-online-serverless
+# app and org for use with dashboard.serverless.com
+#app: your-app-name
+#org: your-org-name
+
+# You can pin your service to only deploy with a specific Serverless version
+# Check out our docs for more details
+frameworkVersion: "3"
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  region: us-east-1
+  iam:
+    role:
+      statements:
+        - Effect: "Allow"
+          Action:
+            - dynamodb:*
+          Resource: 
+            - arn:aws:dynamodb:us-east-1:575849731990:table/Users
+
+plugins:
+  - serverless-offline
+
+# you can define service wide environment variables here
+#  environment:
+#    variable1: value1
+
+functions:
+  register:
+    handler: src/auth.register
+    events:
+      - http: 
+          method: POST
+          path: /auth/register
+          cors: true
+  login:
+    handler: src/auth.login
+    events:
+      - http: 
+          method: POST
+          path: /auth/login
+          cors: true
+
+resources:
+  Resources:
+    Users:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: Users
+        AttributeDefinitions:
+          - AttributeName: phone
+            AttributeType: N
+        KeySchema:
+          - AttributeName: phone
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
