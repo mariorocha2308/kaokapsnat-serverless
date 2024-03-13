@@ -24,6 +24,8 @@ provider:
   name: aws
   runtime: nodejs18.x
   region: us-east-1
+  logs:
+    websocket: true
   iam:
     role:
       statements:
@@ -31,8 +33,8 @@ provider:
           Action:
             - dynamodb:*
           Resource: 
-            - arn:aws:dynamodb:us-east-1:575849731990:table/Users
-            - arn:aws:dynamodb:us-east-1:575849731990:table/Messages
+            - arn:aws:dynamodb:us-east-1:575849731990:table/UsersTable
+            - arn:aws:dynamodb:us-east-1:575849731990:table/MessagesTable
 
   environment:
     WSSAPIGATEWAYENDPOINT:
@@ -68,8 +70,8 @@ functions:
           method: GET
           path: /getTotalUsers
           cors: true
-  websocketHandler:
-    handler: src/chat.handler
+  socket:
+    handler: src/websocket.handler
     events:
       - websocket:
           route: $connect
@@ -87,22 +89,22 @@ resources:
     Users:
       Type: AWS::DynamoDB::Table
       Properties:
-        TableName: Users
+        TableName: UsersTable
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
         AttributeDefinitions:
-          - AttributeName: name
+          - AttributeName: connectionId
             AttributeType: S
-          - AttributeName: phone
-            AttributeType: N
+          - AttributeName: username
+            AttributeType: S
         KeySchema:
-          - AttributeName: phone
+          - AttributeName: connectionId
             KeyType: HASH
         GlobalSecondaryIndexes:
-          - IndexName: NameIndex
+          - IndexName: UsernameIndex
             KeySchema:
-              - AttributeName: name
+              - AttributeName: username
                 KeyType: HASH
             ProvisionedThroughput:
               ReadCapacityUnits: 1
@@ -112,7 +114,7 @@ resources:
     Messages:
       Type: AWS::DynamoDB::Table
       Properties:
-        TableName: Messages
+        TableName: MessagesTable
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
@@ -121,7 +123,7 @@ resources:
             AttributeType: S
           - AttributeName: createdAt
             AttributeType: N
-          - AttributeName: NameToName
+          - AttributeName: usernameToUsername
             AttributeType: S
         KeySchema:
           - AttributeName: messageId
@@ -129,9 +131,9 @@ resources:
           - AttributeName: createdAt
             KeyType: RANGE
         GlobalSecondaryIndexes:
-          - IndexName: NameToNameIndex
+          - IndexName: UsernameToUsernameIndex
             KeySchema:
-              - AttributeName: NameToName
+              - AttributeName: usernameToUsername
                 KeyType: HASH
               - AttributeName: createdAt
                 KeyType: RANGE

@@ -1,63 +1,14 @@
-
 [
-  {
-  "name": "Braulio",
-  "phone": 9203123990,
-  "password": "MkULZtZ8BzJta"
-  }, 
-  {
-    "name": "Carolina",
-    "phone": 4579431610,
-    "password": "hpgCzKFDH7Wy"
-  }, 
-  {
-    "name": "Paulina",
-    "phone": 8168990964,
-    "password": "ggxWM8O8QNMqc"
-  }, 
-  {
-    "name": "Marcos",
-    "phone": 1955714883,
-    "password": "aGONgXPHKuLZd"
-  }, 
-  {
-    "name": "Mario",
-    "phone": 4232097624,
-    "password": "wIzpsfmE3STg"
-  }, 
-  {
-    "name": "Pedro",
-    "phone": 6006894450,
-    "password": "tcol9olapvR"
-  }, 
-  {
-    "name": "Bryan",
-    "phone": 7875643077,
-    "password": "FEOWVVyOSGF"
-  }, 
-  {
-    "name": "Nicolas",
-    "phone": 5101960199,
-    "password": "OkaxzdOexl"
-  },
-  {
-    "name": "Miguel",
-    "phone": 3233970278,
-    "password": "0zZGgPAPp5u"
-  }, 
-  {
-    "name": "Teresa",
-    "phone": 9925893661,
-    "password": "sGudUIJGpw"
-  }, 
-  {
-    "name": "Patricia",
-    "phone": 5648507509,
-    "password": "ljvrMYEIbfsFru"
-  }, 
-  {
-    "name": "Antonieta",
-    "phone": 9735731452,
-    "password": "tyTZk1k9OtCnm"
-  }
+  { "username": "Braulio" }, 
+  { "username": "Carolina" }, 
+  { "username": "Paulina" }, 
+  { "username": "Marcos" }, 
+  { "username": "Mario" }, 
+  { "username": "Pedro" }, 
+  { "username": "Bryan" }, 
+  { "username": "Nicolas" },
+  { "username": "Miguel" }, 
+  { "username": "Teresa" }, 
+  { "username": "Patricia" }, 
+  { "username": "Antonieta" }
 ]

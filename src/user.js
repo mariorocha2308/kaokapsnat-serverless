@@ -1,7 +1,7 @@
 'use strict';
 const AWS = require('aws-sdk');
 
-const TABLE_NAME = "Users"
+const TABLE_NAME = "UsersTable"
 const DYNAMODB = new AWS.DynamoDB.DocumentClient();
 
 module.exports.getUsers = async () => {
@@ -12,7 +12,7 @@ module.exports.getUsers = async () => {
     .promise();
 
   return {
-    statusCode: 400,
+    statusCode: 200,
     body: JSON.stringify(
       {
         users: listUsers.Items || [],

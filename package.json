@@ -14,7 +14,6 @@
   },
   "dependencies": {
     "aws-sdk": "^2.1575.0",
-    "bcrypt": "^5.1.1",
     "uuid": "^9.0.1"
   }
 }
