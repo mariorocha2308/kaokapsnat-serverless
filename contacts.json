@@ -3,50 +3,61 @@
   {
   "name": "Braulio",
   "phone": 9203123990,
-  "passsword": "MkULZtZ8BzJta"
-  }, {
+  "password": "MkULZtZ8BzJta"
+  }, 
+  {
     "name": "Carolina",
     "phone": 4579431610,
-    "passsword": "hpgCzKFDH7Wy"
-  }, {
+    "password": "hpgCzKFDH7Wy"
+  }, 
+  {
     "name": "Paulina",
     "phone": 8168990964,
-    "passsword": "ggxWM8O8QNMqc"
-  }, {
+    "password": "ggxWM8O8QNMqc"
+  }, 
+  {
     "name": "Marcos",
     "phone": 1955714883,
-    "passsword": "aGONgXPHKuLZd"
-  }, {
+    "password": "aGONgXPHKuLZd"
+  }, 
+  {
     "name": "Mario",
     "phone": 4232097624,
-    "passsword": "wIzpsfmE3STg"
-  }, {
+    "password": "wIzpsfmE3STg"
+  }, 
+  {
     "name": "Pedro",
     "phone": 6006894450,
-    "passsword": "tcol9olapvR"
-  }, {
+    "password": "tcol9olapvR"
+  }, 
+  {
     "name": "Bryan",
     "phone": 7875643077,
-    "passsword": "FEOWVVyOSGF"
-  }, {
+    "password": "FEOWVVyOSGF"
+  }, 
+  {
     "name": "Nicolas",
     "phone": 5101960199,
-    "passsword": "OkaxzdOexl"
-  }, {
+    "password": "OkaxzdOexl"
+  },
+  {
     "name": "Miguel",
     "phone": 3233970278,
-    "passsword": "0zZGgPAPp5u"
-  }, {
+    "password": "0zZGgPAPp5u"
+  }, 
+  {
     "name": "Teresa",
     "phone": 9925893661,
-    "passsword": "sGudUIJGpw"
-  }, {
+    "password": "sGudUIJGpw"
+  }, 
+  {
     "name": "Patricia",
     "phone": 5648507509,
-    "passsword": "ljvrMYEIbfsFru"
-  }, {
+    "password": "ljvrMYEIbfsFru"
+  }, 
+  {
     "name": "Antonieta",
     "phone": 9735731452,
-    "passsword": "tyTZk1k9OtCnm"
+    "password": "tyTZk1k9OtCnm"
   }
 ]

@@ -34,21 +34,17 @@ provider:
             - arn:aws:dynamodb:us-east-1:575849731990:table/Users
             - arn:aws:dynamodb:us-east-1:575849731990:table/Messages
 
-  # environment:
-  # WSSAPIGATEWAYENDPOINT:
-  #   Fn::Join:
-  #     - ""
-  #     - - Ref: WebsocketsApi
-  #       - ".execute-api."
-  #       - Ref: AWS::Region
-  #       - ".amazonaws.com/${sls:stage}"
+  environment:
+    WSSAPIGATEWAYENDPOINT:
+      Fn::Join:
+        - ""
+        - - Ref: WebsocketsApi
+          - ".execute-api."
+          - Ref: AWS::Region
+          - ".amazonaws.com/${sls:stage}"
 
 plugins:
   - serverless-offline
-
-# you can define service wide environment variables here
-#  environment:
-#    variable1: value1
 
 functions:
   register:
@@ -72,19 +68,19 @@ functions:
           method: GET
           path: /getTotalUsers
           cors: true
-  # websocketHandler:
-  #   handler: src/chat.handler
-  #   events:
-  #     - websocket:
-  #         route: $connect
-  #     - websocket:
-  #         route: $disconnect
-  #     - websocket:
-  #         route: getMessages
-  #     - websocket:
-  #         route: sendMessage
-  #     - websocket:
-  #         route: getClients
+  websocketHandler:
+    handler: src/chat.handler
+    events:
+      - websocket:
+          route: $connect
+      - websocket:
+          route: $disconnect
+      - websocket:
+          route: getMessages
+      - websocket:
+          route: sendMessage
+      - websocket:
+          route: getContacts
 
 resources:
   Resources:

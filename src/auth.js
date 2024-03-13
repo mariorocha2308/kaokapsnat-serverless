@@ -6,7 +6,7 @@ const bcrypt = require("bcrypt");
 const ID = v4();
 const ITERATIONS = 12;
 const TABLE_NAME = "Users"
-const DATE = new Date().toISOString()
+const DATE = new Date().getTime()
 const DYNAMODB = new AWS.DynamoDB.DocumentClient();
 
 module.exports.hashPassword = async (password) => {
@@ -78,13 +78,13 @@ module.exports.login = async (event) => {
     };
   }
 
-  const { password: hashedPassword } = Item;
+  const { name, password: hashedPassword } = Item;
   const matchedPassword = await this.matchPassword(password, hashedPassword);
 
   if (matchedPassword) {
     return {
       statusCode: 200,
-      body: JSON.stringify({ success: true }),
+      body: JSON.stringify({ success: true, contact: name }),
     };
   } else {
     return {
