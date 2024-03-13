@@ -5,7 +5,7 @@ const bcrypt = require("bcrypt");
 
 const ID = v4();
 const ITERATIONS = 12;
-const TABLE = "Users"
+const TABLE_NAME = "Users"
 const DATE = new Date().toISOString()
 const DYNAMODB = new AWS.DynamoDB.DocumentClient();
 
@@ -46,7 +46,7 @@ module.exports.register = async (event) => {
   }
 
   await DYNAMODB.put({
-    TableName: TABLE,
+    TableName: TABLE_NAME,
     Item: newUser
   }).promise()
 
@@ -66,7 +66,7 @@ module.exports.login = async (event) => {
   const { phone, password } = JSON.parse(event.body);
 
   const { Item } = await DYNAMODB.get({
-    TableName: TABLE,
+    TableName: TABLE_NAME,
     Key: { phone }
   })
     .promise();

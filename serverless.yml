@@ -32,6 +32,16 @@ provider:
             - dynamodb:*
           Resource: 
             - arn:aws:dynamodb:us-east-1:575849731990:table/Users
+            - arn:aws:dynamodb:us-east-1:575849731990:table/Messages
+
+  # environment:
+  # WSSAPIGATEWAYENDPOINT:
+  #   Fn::Join:
+  #     - ""
+  #     - - Ref: WebsocketsApi
+  #       - ".execute-api."
+  #       - Ref: AWS::Region
+  #       - ".amazonaws.com/${sls:stage}"
 
 plugins:
   - serverless-offline
@@ -55,6 +65,26 @@ functions:
           method: POST
           path: /auth/login
           cors: true
+  user:
+    handler: src/user.getUsers
+    events:
+      - http: 
+          method: GET
+          path: /getTotalUsers
+          cors: true
+  # websocketHandler:
+  #   handler: src/chat.handler
+  #   events:
+  #     - websocket:
+  #         route: $connect
+  #     - websocket:
+  #         route: $disconnect
+  #     - websocket:
+  #         route: getMessages
+  #     - websocket:
+  #         route: sendMessage
+  #     - websocket:
+  #         route: getClients
 
 resources:
   Resources:
@@ -62,12 +92,55 @@ resources:
       Type: AWS::DynamoDB::Table
       Properties:
         TableName: Users
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
         AttributeDefinitions:
+          - AttributeName: name
+            AttributeType: S
           - AttributeName: phone
             AttributeType: N
         KeySchema:
           - AttributeName: phone
             KeyType: HASH
+        GlobalSecondaryIndexes:
+          - IndexName: NameIndex
+            KeySchema:
+              - AttributeName: name
+                KeyType: HASH
+            ProvisionedThroughput:
+              ReadCapacityUnits: 1
+              WriteCapacityUnits: 1
+            Projection:
+              ProjectionType: "ALL"
+    Messages:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: Messages
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
+        AttributeDefinitions:
+          - AttributeName: messageId
+            AttributeType: S
+          - AttributeName: createdAt
+            AttributeType: N
+          - AttributeName: NameToName
+            AttributeType: S
+        KeySchema:
+          - AttributeName: messageId
+            KeyType: HASH
+          - AttributeName: createdAt
+            KeyType: RANGE
+        GlobalSecondaryIndexes:
+          - IndexName: NameToNameIndex
+            KeySchema:
+              - AttributeName: NameToName
+                KeyType: HASH
+              - AttributeName: createdAt
+                KeyType: RANGE
+            ProvisionedThroughput:
+              ReadCapacityUnits: 1
+              WriteCapacityUnits: 1
+            Projection:
+              ProjectionType: "ALL"
