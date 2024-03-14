@@ -1,48 +1,48 @@
 'use strict';
 const AWS = require('aws-sdk');
-const { v4 } = require('uuid')
+// const { v4 } = require('uuid')
 
-const UUID = v4()
-const DATE = new Date().toISOString()
+// const UUID = v4()
+// const DATE = new Date().toISOString()
 const TABLE_NAME = "UsersTable"
 const DYNAMODB = new AWS.DynamoDB.DocumentClient();
 
-module.exports.register = async (event) => {
-  const { username } = JSON.parse(event.body);
+// module.exports.register = async (event) => {
+//   const { username } = JSON.parse(event.body);
 
-  if (!username) {
-    return {
-      statusCode: 400,
-      body: JSON.stringify(
-        {
-          error: 'Validate the form fiels',
-        },
-        null,
-        2
-      ),
-    }
-  }
+//   if (!username) {
+//     return {
+//       statusCode: 400,
+//       body: JSON.stringify(
+//         {
+//           error: 'Validate the form fiels',
+//         },
+//         null,
+//         2
+//       ),
+//     }
+//   }
 
-  await DYNAMODB.put({
-    TableName: TABLE_NAME,
-    Item: {
-      connectionId: UUID,
-      username,
-      createdAt: DATE
-    }
-  }).promise()
+//   await DYNAMODB.put({
+//     TableName: TABLE_NAME,
+//     Item: {
+//       connectionId: "-",
+//       username,
+//       createdAt: DATE
+//     }
+//   }).promise()
 
-  return {
-    statusCode: 200,
-    body: JSON.stringify(
-      {
-        message: 'Your register executed successfully!!',
-      },
-      null,
-      2
-    ),
-  }
-};
+//   return {
+//     statusCode: 200,
+//     body: JSON.stringify(
+//       {
+//         message: 'Your register executed successfully!!',
+//       },
+//       null,
+//       2
+//     ),
+//   }
+// };
 
 module.exports.login = async (event) => {
   const { username } = JSON.parse(event.body);
@@ -59,7 +59,7 @@ module.exports.login = async (event) => {
   if (!user) {
     return {
       statusCode: 404,
-      body: JSON.stringify({ error: "User not found" }),
+      body: JSON.stringify({ error: "User not found, register new!" }),
     };
   }
 

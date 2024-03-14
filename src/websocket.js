@@ -1,310 +1,314 @@
 'use strict';
-// const AWS = require("aws-sdk");
-// const { v4 } = require('uuid');
-// const { getUsers } = require('./user')
+const AWS = require("aws-sdk");
+const { v4 } = require('uuid');
+const { getUsers } = require('./user')
 
-// const TABLE_NAMES = {
-//   USERS: "UsersTable",
-//   MESSAGES: "MessagesTable"
-// }
+const TABLE_NAMES = {
+  USERS: "UsersTable",
+  MESSAGES: "MessagesTable"
+}
 
-// const DYNAMODB = new AWS.DynamoDB.DocumentClient();
+const DYNAMODB = new AWS.DynamoDB.DocumentClient();
 
-// const API_GATEWAY = new AWS.ApiGatewayManagementApi({
-//   endpoint: process.env.WSSAPIGATEWAYENDPOINT
-// });
+const API_GATEWAY = new AWS.ApiGatewayManagementApi({
+  endpoint: process.env.APIGATEWAYENDPOINT
+});
 
-// const responseOK = {
-//   statusCode: 200,
-//   body: "",
-// };
-
-// const responseForbidden = {
-//   statusCode: 403,
-//   body: "",
-// };
-
-export const handler = async (event) => {
-  console.log("event:", event);
-//   const connectionId = event.requestContext.connectionId;
-//   const routeKey = event.requestContext.routeKey;
-
-//   try {
-//     switch (routeKey) {
-//       case "$connect":
-//         return handleConnect(connectionId, event.queryStringParameters);
-//       case "$disconnect":
-//         return handleDisconnect(connectionId);
-//       // case "getContacts":
-//       //   return handleGetContacts(connectionId);
-//       // case "sendMessage":
-//       //   return handleSendMessage(
-//       //     await getContact(connectionId),
-//       //     parseSendMessageBody(event.body),
-//       //   );
-//       // case "getMessages":
-//       //   return handleGetMessages(
-//       //     await getContact(connectionId),
-//       //     parseGetMessageBody(event.body),
-//       //   );
-//       default:
-//         return responseForbidden;
-//     }
-//   } catch (e) {
-//     // if (e) {
-//     //   await postToConnection(
-//     //     connectionId,
-//     //     JSON.stringify({ type: "error", message: e.message }),
-//     //   );
-//     //   return responseOK;
-//     // }
-
-//     // throw e;
-//   }
+const responseOK = {
+  statusCode: 200,
+  body: "",
 };
 
-// const handleConnect = async (connectionId, queryParameters) => {
-//   if (!queryParameters || !queryParameters["name"]) {
-//     return responseForbidden;
-//   }
+const responseForbidden = {
+  statusCode: 403,
+  body: "",
+};
 
-//   const existingConnectionId = await getConnectionIdByName(queryParameters["name"]);
-//   if (
-//     existingConnectionId &&
-//     (await postToConnection(
-//       existingConnectionId,
-//       JSON.stringify({ type: "ping" }),
-//     ))
-//   ) {
-//     return responseForbidden;
-//   }
+module.exports.handler = async (event) => {
+  const connectionId = event.requestContext.connectionId;
+  const routeKey = event.requestContext.routeKey;
 
-//   await DYNAMODB
-//     .put({
-//       TableName: TABLE_NAMES.USERS,
-//       Item: {
-//         connectionId,
-//         name: queryParameters["name"],
-//       },
-//     })
-//     .promise();
+  try {
+    switch (routeKey) {
+      case "$connect":
+        return handleConnect(connectionId, event.queryStringParameters);
+      case "$disconnect":
+        return handleDisconnect(connectionId);
+      case "getContacts":
+        return handleGetContacts(connectionId);
+      case "sendMessage":
+        return handleSendMessage(
+            await getContact(connectionId),
+            parseSendMessageBody(event.body),
+          );
+        case "getMessages":
+          return handleGetMessages(
+              await getContact(connectionId),
+              parseGetMessageBody(event.body),
+            );
+      default:
+        return {
+          statusCode: 403,
+          body: "Error in switch routeKey",
+        };
+    }
+  } catch (e) {
+    if (e) {
+      await postToConnection(
+        connectionId,
+        JSON.stringify({ type: "error", message: e.message }),
+      );
+      return responseOK;
+    }
 
-//   await notifyContactChange(connectionId);
+    throw e;
+  }
+};
 
-//   return responseOK;
-// };
+const handleConnect = async (queryParameters) => {
+  if (!queryParameters || !queryParameters["username"]) {
+    return {
+      statusCode: 404,
+      body: "$connect need query parameter ?username=value",
+    };
+  }
 
-// const notifyContactChange = async (excludedConnectionId) => {
-//   const contacts = await getUsers();
+  const existingConnectionId = await getConnectionIdByUsername(queryParameters["username"]);
+  if ( existingConnectionId &&
+    (await postToConnection(
+      existingConnectionId,
+      JSON.stringify({ type: "ping" }),
+    ))
+  ) {
+    return responseForbidden;
+  }
 
-//   await Promise.all(
-//     contacts.map(async (c) => {
-//       if (excludedConnectionId === c.connectionId) {
-//         return;
-//       }
+  await DYNAMODB
+    .put({
+      TableName: TABLE_NAMES.USERS,
+      Item: {
+        connectionId,
+        username: queryParameters["username"],
+      },
+    })
+    .promise();
 
-//       await postToConnection(
-//         c.connectionId,
-//         JSON.stringify({ type: "contacts", value: contacts }),
-//       );
-//     }),
-//   );
-// };
+  await notifyContactChange(connectionId);
 
-// const postToConnection = async (connectionId, messageBody) => {
-//   try {
-//     await API_GATEWAY
-//       .postToConnection({
-//         ConnectionId: connectionId,
-//         Data: messageBody,
-//       })
-//       .promise();
+  return responseOK;
+};
 
-//     return true;
-//   } catch (e) {
-//     if (isConnectionNotExistError(e)) {
-//       await DYNAMODB
-//         .delete({
-//           TableName: TABLE_NAMES.USERS,
-//           Key: {
-//             connectionId,
-//           },
-//         })
-//         .promise();
+const notifyContactChange = async (excludedConnectionId) => {
+  const contacts = await getUsers();
 
-//       return false;
-//     } else {
-//       throw e;
-//     }
-//   }
-// };
+  await Promise.all(
+    contacts.map(async (c) => {
+      if (excludedConnectionId === c.connectionId) {
+        return;
+      }
 
-// const isConnectionNotExistError = (e) =>
-//   (e).statusCode === 410;
+      await postToConnection(
+        c.connectionId,
+        JSON.stringify({ type: "contacts", value: contacts }),
+      );
+    }),
+  );
+};
 
-// const handleDisconnect = async (connectionId) => {
-//   await DYNAMODB
-//     .delete({
-//       TableName: TABLE_NAMES.USERS,
-//       Key: {
-//         connectionId,
-//       },
-//     })
-//     .promise();
+const postToConnection = async (connectionId, messageBody) => {
+  try {
+    await API_GATEWAY
+      .postToConnection({
+        ConnectionId: connectionId,
+        Data: messageBody,
+      })
+      .promise();
 
-//   await notifyContactChange(connectionId);
+    return true;
+  } catch (e) {
+    if (isConnectionNotExistError(e)) {
+      await DYNAMODB
+        .delete({
+          TableName: TABLE_NAMES.USERS,
+          Key: {
+            connectionId,
+          },
+        })
+        .promise();
 
-//   return responseOK;
-// };
+      return false;
+    } else {
+      throw e;
+    }
+  }
+};
 
-// const handleGetContacts = async (connectionId) => {
-//   await postToConnection(
-//     connectionId,
-//     JSON.stringify({
-//       type: "contacts",
-//       value: await getUsers(),
-//     }),
-//   );
+const isConnectionNotExistError = (e) =>
+  (e).statusCode === 410;
 
-//   return responseOK;
-// };
+const handleDisconnect = async (connectionId) => {
+  await DYNAMODB
+    .delete({
+      TableName: TABLE_NAMES.USERS,
+      Key: {
+        connectionId,
+      },
+    })
+    .promise();
 
-// const handleSendMessage = async (client, body) => {
-//   const nameToname = getNameToName([
-//     client.name,
-//     body.recipientName,
-//   ]);
+  await notifyContactChange(connectionId);
 
-//   await DYNAMODB
-//     .put({
-//       TableName: TABLE_NAMES.MESSAGES,
-//       Item: {
-//         messageId: v4(),
-//         NameToName: nameToname,
-//         message: body.message,
-//         sender: client.name,
-//         createdAt: new Date().toISOString(),
-//       },
-//     })
-//     .promise();
+  return responseOK;
+};
 
-//   const recipientConnectionId = await getConnectionIdByName(
-//     body.recipientName,
-//   );
+const handleGetContacts = async (connectionId) => {
+  await postToConnection(
+    connectionId,
+    JSON.stringify({
+      type: "contacts",
+      value: await getUsers(),
+    }),
+  );
 
-//   if (recipientConnectionId) {
-//     await API_GATEWAY
-//       .postToConnection({
-//         ConnectionId: recipientConnectionId,
-//         Data: JSON.stringify({
-//           type: "message",
-//           value: {
-//             sender: client.name,
-//             message: body.message,
-//           },
-//         }),
-//       })
-//       .promise();
-//   }
+  return responseOK;
+};
 
-//   return responseOK;
-// };
+const handleSendMessage = async (client, body) => {
+  const usernameTousername = getUsernameToUsername([
+    client.username,
+    body.recipientUsername,
+  ]);
 
-// const getContact = async (connectionId) => {
-//   const output = await DYNAMODB
-//     .get({
-//       TableName: TABLE_NAMES.USERS,
-//       Key: {
-//         connectionId,
-//       },
-//     })
-//     .promise();
+  await DYNAMODB
+    .put({
+      TableName: TABLE_NAMES.MESSAGES,
+      Item: {
+        messageId: v4(),
+        usernameToUsername: usernameTousername,
+        message: body.message,
+        sender: client.username,
+        createdAt: new Date().toISOString(),
+      },
+    })
+    .promise();
 
-//   if (!output.Item) {
-//     throw new HandlerError("client does not exist");
-//   }
+  const recipientConnectionId = await getConnectionIdByUsername(
+    body.recipientUsername,
+  );
 
-//   return output.Item;
-// };
+  if (recipientConnectionId) {
+    await API_GATEWAY
+      .postToConnection({
+        ConnectionId: recipientConnectionId,
+        Data: JSON.stringify({
+          type: "message",
+          value: {
+            sender: client.username,
+            message: body.message,
+          },
+        }),
+      })
+      .promise();
+  }
 
-// const parseSendMessageBody = (body) => {
-//   const sendMsgBody = JSON.parse(body || "{}");
+  return responseOK;
+};
 
-//   if (!sendMsgBody || !sendMsgBody.recipientName || !sendMsgBody.message) {
-//     throw new HandlerError("invalid SendMessageBody");
-//   }
+const getContact = async (connectionId) => {
+  const output = await DYNAMODB
+    .get({
+      TableName: TABLE_NAMES.USERS,
+      Key: {
+        connectionId,
+      },
+    })
+    .promise();
 
-//   return sendMsgBody;
-// };
+  if (!output.Item) {
+    throw new HandlerError("client does not exist");
+  }
 
-// const getNameToName = (names) =>
-//   names.sort().join("#");
+  return output.Item;
+};
 
-// const getConnectionIdByName = async (name) => {
-//   const output = await DYNAMODB
-//     .query({
-//       TableName: TABLE_NAMES.USERS,
-//       IndexName: "NameIndex",
-//       KeyConditionExpression: "#name = :name",
-//       ExpressionAttributeNames: {
-//         "#name": "name",
-//       },
-//       ExpressionAttributeValues: {
-//         ":name": name,
-//       },
-//     })
-//     .promise();
+const parseSendMessageBody = (body) => {
+  const sendMsgBody = JSON.parse(body || "{}");
 
-//   return output.Items && output.Items.length > 0
-//     ? output.Items[0].connectionId
-//     : undefined;
-// };
+  if (!sendMsgBody || !sendMsgBody.recipientUserame || !sendMsgBody.message) {
+    throw new HandlerError("invalid SendMessageBody");
+  }
 
-// const handleGetMessages = async (client, body) => {
-//   const output = await DYNAMODB
-//     .query({
-//       TableName: TABLE_NAMES.MESSAGES,
-//       IndexName: "NameToNameIndex",
-//       KeyConditionExpression: "#NameToName = :NameToName",
-//       ExpressionAttributeNames: {
-//         "#NameToName": "NameToName",
-//       },
-//       ExpressionAttributeValues: {
-//         ":NameToName": getNameToName([
-//           client.name,
-//           body.targetName,
-//         ]),
-//       },
-//       Limit: body.limit,
-//       ExclusiveStartKey: body.startKey,
-//       ScanIndexForward: false,
-//     })
-//     .promise();
+  return sendMsgBody;
+};
 
-//   await postToConnection(
-//     client.id,
-//     JSON.stringify({
-//       type: "messages",
-//       value: {
-//         messages: output.Items && output.Items.length > 0 ? output.Items : [],
-//         lastEvaluatedKey: output.LastEvaluatedKey,
-//       },
-//     }),
-//   );
+const getUsernameToUsername = (names) =>
+  names.sort().join("#");
 
-//   return responseOK;
-// };
+const getConnectionIdByUsername = async (username) => {
+  const output = await DYNAMODB
+    .query({
+      TableName: TABLE_NAMES.USERS,
+      IndexName: "UsernameIndex",
+      KeyConditionExpression: "#username = :username",
+      ExpressionAttributeNames: {
+        "#username": "username",
+      },
+      ExpressionAttributeValues: {
+        ":username": username,
+      },
+    })
+    .promise();
+  
+  return output.Items && output.Items.length > 0
+    ? output.Items[0].connectionId
+    : undefined;
+};
 
-// const parseGetMessageBody = (body) => {
-//   const getMessagesBody = JSON.parse(body || "{}");
+const handleGetMessages = async (client, body) => {
+  const output = await DYNAMODB
+    .query({
+      TableName: TABLE_NAMES.MESSAGES,
+      IndexName: "UsernameToUsernameIndex",
+      KeyConditionExpression: "#usernameToUsername = :usernameToUsername",
+      ExpressionAttributeNames: {
+        "#usernameToUsername": "usernameToUsername",
+      },
+      ExpressionAttributeValues: {
+        ":usernameToUsername": getUsernameToUsername([
+          client.username,
+          body.targetName,
+        ]),
+      },
+      Limit: body.limit,
+      ExclusiveStartKey: body.startKey,
+      ScanIndexForward: false,
+    })
+    .promise();
 
-//   if (
-//     !getMessagesBody ||
-//     !getMessagesBody.targetName ||
-//     !getMessagesBody.limit
-//   ) {
-//     throw new HandlerError("invalid GetMessageBody");
-//   }
+  await postToConnection(
+    client.id,
+    JSON.stringify({
+      type: "messages",
+      value: {
+        messages: output.Items && output.Items.length > 0 ? output.Items : [],
+        lastEvaluatedKey: output.LastEvaluatedKey,
+      },
+    }),
+  );
 
-//   return getMessagesBody;
-// };
+  return responseOK;
+};
+
+const parseGetMessageBody = (body) => {
+  const getMessagesBody = JSON.parse(body || "{}");
+
+  if (
+    !getMessagesBody ||
+    !getMessagesBody.targetName ||
+    !getMessagesBody.limit
+  ) {
+    throw new HandlerError("invalid GetMessageBody");
+  }
+
+  return getMessagesBody;
+};
