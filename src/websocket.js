@@ -11,7 +11,7 @@ const TABLE_NAMES = {
 const DYNAMODB = new AWS.DynamoDB.DocumentClient();
 
 const API_GATEWAY = new AWS.ApiGatewayManagementApi({
-  endpoint: process.env.APIGATEWAYENDPOINT
+  endpoint: process.env.WSSAPIGATEWAYENDPOINT
 });
 
 const responseOK = {

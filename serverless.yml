@@ -36,7 +36,7 @@ provider:
             - arn:aws:dynamodb:us-east-1:575849731990:table/UsersTable
             - arn:aws:dynamodb:us-east-1:575849731990:table/MessagesTable
   environment:
-    APIGATEWAYENDPOINT:
+    WSSAPIGATEWAYENDPOINT:
       Fn::Join:
         - ""
         - - "https://"
