@@ -39,7 +39,8 @@ provider:
     APIGATEWAYENDPOINT:
       Fn::Join:
         - ""
-        - - Ref: WebsocketsApi
+        - - "https://"
+          - Ref: WebsocketsApi
           - ".execute-api."
           - Ref: AWS::Region
           - ".amazonaws.com/${sls:stage}"
