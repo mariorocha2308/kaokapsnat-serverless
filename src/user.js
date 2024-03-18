@@ -1,15 +1,11 @@
 'use strict';
-const AWS = require('aws-sdk');
-
-const TABLE_NAME = "UsersTable"
-const DYNAMODB = new AWS.DynamoDB.DocumentClient();
+const { TABLES_NAMES, DYNAMODBCLIENT } = require("./utils/const");
 
 module.exports.getUsers = async () => {
-  const listUsers = await DYNAMODB
+  const listUsers = await DYNAMODBCLIENT
     .scan({
-      TableName: TABLE_NAME,
-    })
-    .promise();
+      TableName: TABLES_NAMES.USER,
+    });
 
   return {
     statusCode: 200,

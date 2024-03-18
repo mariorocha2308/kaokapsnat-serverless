@@ -33,14 +33,14 @@ provider:
           Action:
             - dynamodb:*
           Resource: 
-            - arn:aws:dynamodb:us-east-1:575849731990:table/UsersTable
-            - arn:aws:dynamodb:us-east-1:575849731990:table/MessagesTable
+            - arn:aws:dynamodb:us-east-1:575849731990:table/UsersTables
+            - arn:aws:dynamodb:us-east-1:575849731990:table/MessagesTables
+            - arn:aws:dynamodb:us-east-1:575849731990:table/ConnectionsTables
   environment:
     WSSAPIGATEWAYENDPOINT:
       Fn::Join:
         - ""
-        - - "https://"
-          - Ref: WebsocketsApi
+        - - Ref: WebsocketsApi
           - ".execute-api."
           - Ref: AWS::Region
           - ".amazonaws.com/${sls:stage}"
@@ -49,13 +49,13 @@ plugins:
   - serverless-offline
 
 functions:
-  # register:
-  #   handler: src/auth.register
-  #   events:
-  #     - http: 
-  #         method: POST
-  #         path: /auth/register
-  #         cors: true
+  register: 
+    handler: src/auth.register
+    events:
+      - http: 
+          method: POST
+          path: /auth/register
+          cors: true
   login:
     handler: src/auth.login
     events:
@@ -71,7 +71,7 @@ functions:
           path: /getTotalUsers
           cors: true
   socket:
-    handler: src/websocket.handler
+    handler: src/websocket/index.handler
     events:
       - websocket:
           route: $connect
@@ -89,17 +89,30 @@ resources:
     Users:
       Type: AWS::DynamoDB::Table
       Properties:
-        TableName: UsersTable
+        TableName: UsersTables
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
         AttributeDefinitions:
-          - AttributeName: connectionId
+          - AttributeName: uid
+            AttributeType: S
+        KeySchema:
+          - AttributeName: uid
+            KeyType: HASH
+    Connections:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ConnectionsTables
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        AttributeDefinitions:
+          - AttributeName: connId
             AttributeType: S
           - AttributeName: username
             AttributeType: S
         KeySchema:
-          - AttributeName: connectionId
+          - AttributeName: connId
             KeyType: HASH
         GlobalSecondaryIndexes:
           - IndexName: UsernameIndex
@@ -114,7 +127,7 @@ resources:
     Messages:
       Type: AWS::DynamoDB::Table
       Properties:
-        TableName: MessagesTable
+        TableName: MessagesTables
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
@@ -122,7 +135,7 @@ resources:
           - AttributeName: messageId
             AttributeType: S
           - AttributeName: createdAt
-            AttributeType: N
+            AttributeType: S
           - AttributeName: usernameToUsername
             AttributeType: S
         KeySchema:

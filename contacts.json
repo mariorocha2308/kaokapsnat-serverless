@@ -1,14 +1,51 @@
 [
-  { "username": "Braulio" }, 
-  { "username": "Carolina" }, 
-  { "username": "Paulina" }, 
-  { "username": "Marcos" }, 
-  { "username": "Mario" }, 
-  { "username": "Pedro" }, 
-  { "username": "Bryan" }, 
-  { "username": "Nicolas" },
-  { "username": "Miguel" }, 
-  { "username": "Teresa" }, 
-  { "username": "Patricia" }, 
-  { "username": "Antonieta" }
+  {
+    "username": "Braulio",
+    "phone": "+52 920-312-3990",
+    "password": "MkULZtZ8BzJta"
+  }, {
+    "username": "Carolina",
+    "phone": "+52 457-943-1610",
+    "password": "hpgCzKFDH7Wy"
+  }, {
+    "username": "Paulina",
+    "phone": "+52 816-899-0964",
+    "password": "ggxWM8O8QNMqc"
+  }, {
+    "username": "Marcos",
+    "phone": "+52 195-571-4883",
+    "password": "aGONgXPHKuLZd"
+  }, {
+    "username": "Mario",
+    "phone": "+52 423-209-7624",
+    "password": "wIzpsfmE3STg"
+  }, {
+    "username": "Pedro",
+    "phone": "+52 600-689-4450",
+    "password": "tcol9olapvR"
+  }, {
+    "username": "Bryan",
+    "phone": "+52 787-564-3077",
+    "password": "FEOWVVyOSGF"
+  }, {
+    "username": "Nicolas",
+    "phone": "+52 510-196-0199",
+    "password": "OkaxzdOexl"
+  }, {
+    "username": "Miguel",
+    "phone": "+52 323-397-0278",
+    "password": "0zZGgPAPp5u"
+  }, {
+    "username": "Teresa",
+    "phone": "+52 992-589-3661",
+    "password": "sGudUIJGpw"
+  }, {
+    "username": "Patricia",
+    "phone": "+52 564-850-7509",
+    "password": "ljvrMYEIbfsFru"
+  }, {
+    "username": "Antonieta",
+    "phone": "+52 973-573-1452",
+    "password": "tyTZk1k9OtCnm"
+  }
 ]
